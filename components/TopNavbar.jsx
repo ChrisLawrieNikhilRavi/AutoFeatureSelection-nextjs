@@ -90,7 +90,7 @@ export default function TopNavbar() {
             variants={popUp}
             className="relative hidden sm:inline-flex mr-3"
           >
-            <h1 className="font-mono text-xl">Feature Selection</h1>
+            <h1 className="font-mono text-xl">FS</h1>
             {/* TODO: Change Font */}
           </motion.div>
           <div
