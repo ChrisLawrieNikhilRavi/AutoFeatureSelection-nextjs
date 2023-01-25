@@ -39,6 +39,7 @@ function MyApp({ Component, pageProps }) {
         {/* {process.env.NODE_ENV === "production" && (
           <GoogleAnalytics strategy="lazyOnload" />
         )} */}
+        {/* TODO: Add Google Analytics */}
         <Component {...pageProps} />
       </Layout>
     </DarkModeProvider>

@@ -19,6 +19,12 @@ const pageMeta = {
     image: "https://quantdare.com/wp-content/uploads/2019/11/features_1.png",
     keywords: "Privacy, Privacy Policies, ",
   },
+  preprocess: {
+    title: "Preprocessing",
+    description: "This is where the user preprocesses their data.",
+    image: "https://quantdare.com/wp-content/uploads/2019/11/features_1.png",
+    keywords: "Feature Selection, Preprocess",
+  },
 };
 
 export default pageMeta;

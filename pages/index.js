@@ -1,18 +1,35 @@
 import Image from "next/image";
 import {
   FadeContainer,
-  headingFromLeft,
   opacityVariant,
   popUp,
 } from "@/content/FramerMotionVariants";
-import { homeProfileImage } from "@/utils/utils"; // not created yet
+import { homeProfileImage } from "@/utils/utils";
 import { motion } from "framer-motion";
 import { FiUpload } from "react-icons/fi";
 import Ripples from "react-ripples";
 import Metadata from "@/components/MetaData";
 import pageMeta from "@/content/meta";
+import { useS3Upload } from "next-s3-upload";
+import { useState } from "react";
+import nProgress from "nprogress";
+import { useRouter } from "next/router";
 
 export default function Home() {
+  const router = useRouter();
+  const [csvUrl, setCsvUrl] = useState();
+  const { FileInput, openFileDialog, uploadToS3 } = useS3Upload();
+  const handleFileChange = async (file) => {
+    console.log(file.name);
+    nProgress.start();
+    let { url } = await uploadToS3(file);
+    setCsvUrl(url);
+    nProgress.done();
+    router.push(
+      { pathname: "/preprocess", query: { url: url } },
+      "/preprocess"
+    );
+  };
   return (
     <>
       <Metadata
@@ -75,8 +92,9 @@ export default function Home() {
               <Ripples className="w-full" color="rgba(0, 0, 0, 0.5)">
                 <button
                   className="flex items-center gap-2 px-5 py-2 border rounded-md border-gray-500 dark:border-gray-400 select-none  hover:bg-gray-100 dark:hover:bg-neutral-800 outline-none"
-                  onClick={() => window.open("/resume")}
+                  onClick={openFileDialog}
                 >
+                  <FileInput onChange={handleFileChange} />
                   <FiUpload />
                   <p>Upload</p>
                 </button>
@@ -87,4 +105,10 @@ export default function Home() {
       </div>
     </>
   );
+}
+
+function getS3FolderName(url) {
+  const parts = url.split("/");
+  const folderName = parts[parts.length - 2];
+  return folderName;
 }
