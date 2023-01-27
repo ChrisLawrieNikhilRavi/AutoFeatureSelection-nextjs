@@ -3,32 +3,74 @@ import { motion } from "framer-motion";
 import Metadata from "@/components/MetaData";
 import pageMeta from "@/content/meta";
 import { useRouter } from "next/router";
+import { ResponsiveBar } from "@nivo/bar";
+
+const Bar = (data) => {
+  return (
+    <ResponsiveBar
+      data={data}
+      keys={["degress"]}
+      indexBy="day"
+      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      padding={0.4}
+      valueScale={{ type: "linear" }}
+      colors="#3182CE"
+      animate={true}
+      enableLabel={false}
+      axisTop={null}
+      axisRight={null}
+      axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: "degrees",
+        legendPosition: "middle",
+        legendOffset: -40,
+      }}
+    />
+  );
+};
 
 export default function Home() {
-  const router = useRouter();
-  let { url } = router.query;
-
+  const data = [
+    { day: "Monday", degress: 59 },
+    { day: "Tuesday", degress: 61 },
+    { day: "Wednesday", degress: 55 },
+    { day: "Thursday", degress: 78 },
+    { day: "Friday", degress: 71 },
+    { day: "Saturday", degress: 56 },
+    { day: "Sunday", degress: 67 },
+  ];
   return (
     <>
       <Metadata
-        description={pageMeta.preprocess.description}
-        previewImage={pageMeta.preprocess.image}
-        keywords={pageMeta.preprocess.keywords}
+        description={pageMeta.about.description}
+        previewImage={pageMeta.about.image}
+        keywords={pageMeta.about.keywords}
       />
 
-      {/* Following is the new Code */}
-      <div className="relative dark:bg-darkPrimary dark:text-gray-100 max-w-4xl 2xl:max-w-5xl 3xl:max-w-7xl mx-auto">
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          variants={FadeContainer}
-          viewport={{ once: true }}
-          className="grid place-content-center py-20  min-h-screen"
-        >
-          <div className="w-full relative mx-auto flex flex-col items-center gap-10">
-            Front end sandbox for chris! :)
-          </div>
-        </motion.section>
+      <div className="h-screen m-4">
+        <ResponsiveBar
+          data={data}
+          keys={["degress"]}
+          indexBy="day"
+          margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+          padding={0.4}
+          valueScale={{ type: "linear" }}
+          colors="#3182CE"
+          animate={true}
+          enableLabel={false}
+          axisTop={null}
+          axisRight={null}
+          axisLeft={{
+            tickSize: 5,
+            tickPadding: 5,
+            tickRotation: 0,
+            legend: "degrees",
+            legendPosition: "middle",
+            legendOffset: -40,
+          }}
+        />
       </div>
     </>
   );
