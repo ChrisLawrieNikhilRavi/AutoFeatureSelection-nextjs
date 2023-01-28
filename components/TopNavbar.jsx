@@ -7,15 +7,22 @@ import {
   FadeContainer,
   hamFastFadeContainer,
   mobileNavItemSideways,
+  opacityVariant,
   popUp,
 } from "@/content/FramerMotionVariants";
 import { useDarkMode } from "@/context/darkModeContext";
 import { navigationRoutes } from "@/utils/utils";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
-
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { IoIosSettings } from "react-icons/io";
+import { RiSettings6Fill } from "react-icons/ri";
+import { Menu } from "@headlessui/react";
 /* TopNavbar Component */
 export default function TopNavbar() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
   const navRef = useRef(null);
+  const router = useRouter();
 
   /*  Using to control animation as I'll show the name to the mobile navbar when you scroll a bit
    * demo: https://i.imgur.com/5LKI5DY.gif
@@ -24,6 +31,13 @@ export default function TopNavbar() {
   const [navOpen, setNavOpen] = useState(false);
   const { isDarkMode, changeDarkMode } = useDarkMode();
 
+  const logOutUser = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error(error);
+    }
+    router.push("/");
+  };
   // Adding Shadow, backdrop to the navbar as user scroll the screen
   const addShadowToNavbar = useCallback(() => {
     if (window.pageYOffset > 10) {
@@ -64,7 +78,7 @@ export default function TopNavbar() {
   }
 
   /* To Lock  the Scroll when user visit the mobile nav page */
-  function handleClick() {
+  function handleNavClick() {
     lockScroll();
     setNavOpen(!navOpen);
   }
@@ -75,10 +89,19 @@ export default function TopNavbar() {
       ref={navRef}
     >
       {/* Mobile Navigation Hamburger and MobileMenu */}
-      <HamBurger open={navOpen} handleClick={handleClick} />
+      <HamBurger
+        open={navOpen}
+        handleClick={handleNavClick}
+        className="sm:hidden"
+      />
       <AnimatePresence>
         {navOpen && (
-          <MobileMenu links={navigationRoutes} handleClick={handleClick} />
+          <MobileMenu
+            links={navigationRoutes}
+            handleClick={handleNavClick}
+            session={session}
+            logOutUser={logOutUser}
+          />
         )}
       </AnimatePresence>
 
@@ -93,15 +116,7 @@ export default function TopNavbar() {
             <h1 className="font-mono text-xl">FS</h1>
             {/* TODO: Change Font */}
           </motion.div>
-          <div
-            // initial="hidden"
-            // animate={control}
-            // variants={{
-            //   hidden: { opacity: 0, scale: 1, display: "none" },
-            //   visible: { opacity: 1, scale: 1, display: "inline-flex" },
-            // }}
-            className="absolute sm:!hidden w-fit left-0 right-0 mx-auto flex justify-center  text-base font-mono"
-          >
+          <div className="absolute sm:!hidden w-fit left-0 right-0 mx-auto flex justify-center  text-base font-mono">
             Feature Selection
           </div>
         </div>
@@ -121,14 +136,26 @@ export default function TopNavbar() {
         </motion.div>
       </motion.nav>
 
-      {/* DarkMode Container */}
+      {/* Sign Out Container */}
       <motion.div
         initial="hidden"
         animate="visible"
         variants={popUp}
-        className="cursor-pointer"
+        className="cursor-pointer gap-4 flex"
         title="Toggle Theme"
       >
+        <Menu as="div" className="relative">
+          <Menu.Button className="hidden sm:inline-flex cursor-pointer">
+            <IoIosSettings className="h-6 w-6" aria-hidden="true" />
+          </Menu.Button>
+          <UserManagementMenu
+            isDarkMode={isDarkMode}
+            changeDarkMode={changeDarkMode}
+            session={session}
+            logOutUser={logOutUser}
+          />
+        </Menu>
+        {/* DarkMode Container */}
         <DarkModeSwitch
           checked={isDarkMode}
           onChange={changeDarkMode}
@@ -160,14 +187,14 @@ function NavItem({ href, text }) {
 }
 
 // Hamburger Button
-function HamBurger({ open, handleClick }) {
+function HamBurger({ open, handleClick, className }) {
   return (
     <motion.div
       style={{ zIndex: 1000 }}
       initial="hidden"
       animate="visible"
       variants={popUp}
-      className="sm:hidden"
+      className={className}
     >
       {!open ? (
         <svg
@@ -207,7 +234,11 @@ function HamBurger({ open, handleClick }) {
 }
 
 // Mobile navigation menu
-const MobileMenu = ({ links, handleClick }) => {
+const MobileMenu = ({ links, handleClick, session, logOutUser }) => {
+  function handleLogout() {
+    logOutUser();
+    handleClick();
+  }
   return (
     <motion.div
       className="absolute font-normal bg-white dark:bg-darkPrimary w-screen h-screen top-0 left-0 z-10 sm:hidden"
@@ -217,6 +248,13 @@ const MobileMenu = ({ links, handleClick }) => {
       exit="hidden"
     >
       <motion.nav className="mt-28 mx-8 flex flex-col">
+        {session && (
+          <p className="border-b border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 font-semibold flex w-auto py-4 text-base cursor-pointer">
+            <motion.p variants={mobileNavItemSideways}>
+              Logged in as {session.user.email}
+            </motion.p>
+          </p>
+        )}
         {links.slice(0, 7).map((link, index) => {
           const navlink =
             link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
@@ -233,7 +271,70 @@ const MobileMenu = ({ links, handleClick }) => {
             </Link>
           );
         })}
+        {session ? (
+          <Link
+            href="/login"
+            onClick={handleLogout}
+            className="border-b border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 font-semibold flex w-auto py-4 capitalize text-base cursor-pointer"
+          >
+            <motion.p variants={mobileNavItemSideways}>Logout</motion.p>
+          </Link>
+        ) : (
+          <Link
+            href="/login"
+            onClick={handleClick}
+            className="border-b border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 font-semibold flex w-auto py-4 capitalize text-base cursor-pointer"
+          >
+            <motion.p variants={mobileNavItemSideways}>Login</motion.p>
+          </Link>
+        )}
       </motion.nav>
     </motion.div>
+  );
+};
+
+// User management menu
+const UserManagementMenu = ({
+  isDarkMode,
+  changeDarkMode,
+  session,
+  logOutUser,
+}) => {
+  function handleLogout() {
+    logOutUser();
+  }
+  return (
+    <Menu.Items className="absolute hidden sm:flex flex-col font-normal bg-white dark:bg-darkPrimary top-14 right-6 w-56 border-2 py-2 px-5 rounded-md">
+      {session ? (
+        <>
+          <Menu.Item>
+            <p
+              variants={opacityVariant}
+              className="border-b border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 font-semibold flex w-auto py-4 text-base cursor-pointer"
+            >
+              Logged in as {session.user.email}
+            </p>
+          </Menu.Item>
+          <Menu.Item>
+            <Link
+              href="/"
+              onClick={handleLogout}
+              className=" border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 font-semibold flex w-auto py-4 capitalize text-base cursor-pointer"
+            >
+              <motion.p variants={opacityVariant}>Logout</motion.p>
+            </Link>
+          </Menu.Item>
+        </>
+      ) : (
+        <Menu.Item>
+          <Link
+            href="/login"
+            className="border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 font-semibold flex w-44 py-4 capitalize text-base cursor-pointer"
+          >
+            <motion.p variants={opacityVariant}>Login</motion.p>
+          </Link>
+        </Menu.Item>
+      )}
+    </Menu.Items>
   );
 };
