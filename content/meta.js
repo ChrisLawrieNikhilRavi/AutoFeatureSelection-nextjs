@@ -25,6 +25,18 @@ const pageMeta = {
     image: "https://quantdare.com/wp-content/uploads/2019/11/features_1.png",
     keywords: "Feature Selection, Preprocess",
   },
+  login: {
+    title: "Login",
+    description: "This is where the user logs in.",
+    image: "https://quantdare.com/wp-content/uploads/2019/11/features_1.png",
+    keywords: "Feature Selection, Login",
+  },
+  dashboard: {
+    title: "Dashboard",
+    description: "This is where the user logs in.",
+    image: "https://quantdare.com/wp-content/uploads/2019/11/features_1.png",
+    keywords: "Feature Selection, Dashboard",
+  },
 };
 
 export default pageMeta;
