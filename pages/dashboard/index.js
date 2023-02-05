@@ -34,7 +34,7 @@ export default function Home() {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     const { data, error } = await supabase.storage
-      .from("users")
+      .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET)
       .upload(`${user.id}/${file.name}`, file, {
         cacheControl: "3600",
         upsert: true,

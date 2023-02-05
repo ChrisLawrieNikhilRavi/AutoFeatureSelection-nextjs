@@ -119,7 +119,7 @@ export default function Home() {
           </button>
         </AnimatedDiv>
         {data && COLUMNS ? (
-          <AnimatedDiv className="overflow-scroll mt-5">
+          <AnimatedDiv className="overflow-scroll mt-5 mx-auto">
             <Table DATA={data} COLUMNS={COLUMNS} />
             <Paginate
               totalItems={file.count}
