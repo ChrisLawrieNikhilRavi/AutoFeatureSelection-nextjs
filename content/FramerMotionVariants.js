@@ -1,5 +1,3 @@
-import { Variants } from "framer-motion";
-
 export const popUp = {
   hidden: { scale: 0, opacity: 0 },
   visible: {

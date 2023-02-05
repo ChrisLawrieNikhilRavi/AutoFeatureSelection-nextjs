@@ -1,6 +1,5 @@
 import { popUpFromBottomForText } from "@/content/FramerMotionVariants";
 import Link from "next/link";
-import React from "react";
 import format from "date-fns/format";
 import AnimatedDiv from "./AnimatedDiv";
 import { FiDelete } from "react-icons/fi";
@@ -27,7 +26,7 @@ const FileListItem = ({
       <div className="flex items-center gap-3">
         <div className="flex-grow flex-col">
           <Link
-            href="/"
+            href={`/dashboard/${file.name}`}
             className="font-semibold hover:underline text-sm sm:text-base md:text-lg text-neutral-900 dark:text-neutral-200"
           >
             {file.name}
